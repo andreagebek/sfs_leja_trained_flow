@@ -9,9 +9,9 @@ from scipy.stats import norm as norm_density
 ### sample the trained flow over some regular parameter grid
 ### to compute the probability density
 ### the spacing of this grid can be altered as desired
-nlogm, nsfr, dz = 20, 60, 0.2
+nlogm, nsfr, dz = 10, 50, 0.2
 ndummy = 31
-mmin, mmax = 8.6, 11.3
+mmin, mmax = 9.89486727, 12. # Use 3D-HST mass completeness estimate from Leja+2022 as lower limit
 sfrmin, sfrmax = -2,2.5
 zmin, zmax = 0.2, 3.0
 
@@ -32,8 +32,8 @@ def do_all():
     prob_density = sample_density(flow,redshift_smoothing=True)
     plot_logm_logsfr(prob_density)
 
-def plot_logm_logsfr(prob_density, ztarget=1.0):
-    """Plot the logM--logSFR density at z=1 using the flow likelihood
+def plot_logm_logsfr(prob_density, ztarget=2.0):
+    """Plot the logM--logSFR density at z=2 using the flow likelihood
     This is a simple working example of how to operate on the density
     """
 
@@ -41,6 +41,15 @@ def plot_logm_logsfr(prob_density, ztarget=1.0):
     # note that prob_density has dimensions [n_mass, n_z, n_sfr]
     zidx = np.abs(zgrid-ztarget).argmin()
     density = prob_density[:,:,zidx]
+
+    storeArray = np.zeros((np.size(density, axis = 0) + 1, np.size(density, axis = 1) + 1))
+    storeArray[0, 0] = np.nan
+    storeArray[1:, 0] = mgrid
+    storeArray[0, 1:] = sfrgrid
+    storeArray[1:, 1:] = density
+
+    header = 'Galaxy density as function of log(stellar mass/Msun) (rows) and log(SFR/(Msun/yr)) (columns)'
+    np.savetxt('Leja2022density.txt', storeArray, header = header)
 
     # Set density below the mass-complete limit to zero
     # This is an extrapolation of the density field, since no
@@ -154,3 +163,5 @@ def threedhst_mass_completeness(zred):
     mcomp_prosp = np.array([8.86614882, 9.07108637, 9.63281923,
                             9.89486727, 10.15444536])
     return np.interp(zred, ztal, mcomp_prosp)
+
+do_all()
