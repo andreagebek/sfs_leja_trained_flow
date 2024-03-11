@@ -9,9 +9,9 @@ from scipy.stats import norm as norm_density
 ### sample the trained flow over some regular parameter grid
 ### to compute the probability density
 ### the spacing of this grid can be altered as desired
-nlogm, nsfr, dz = 10, 50, 0.2
+nlogm, nsfr, dz = 50, 50, 0.2
 ndummy = 31
-mmin, mmax = 9.89486727, 12. # Use 3D-HST mass completeness estimate from Leja+2022 as lower limit
+mmin, mmax = 9.8512, 12. # Use 3D-HST mass completeness estimate from Leja+2022 as lower limit
 sfrmin, sfrmax = -2,2.5
 zmin, zmax = 0.2, 3.0
 
@@ -58,6 +58,7 @@ def plot_logm_logsfr(prob_density, ztarget=2.0):
     # COSMOS15 covers 0.2 < z < 0.8; in the overlap region,
     # 3D-HST has a deeper mass-complete limit
     below_mcomp = mgrid < threedhst_mass_completeness(ztarget)
+
     density[below_mcomp,:] = np.nan
 
     # generate color between 'grid' points and transpose
